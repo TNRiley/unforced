@@ -1,0 +1,1020 @@
+<title>Unforced Error</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:ital,wght@0,400;0,500;0,600;1,400&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&display=swap">
+<style>
+/* ── tokens ────────────────────────────────────────────────────────────────
+   Hard-court blue is the accent; clay and grass carry meaning, not decoration.
+   Every token is declared here, in the bare :root, so the un-stamped state
+   (no data-theme, OS preference only) resolves correctly.                    */
+:root{
+  --bg:#e9edeb; --panel:#fbfcfc; --panel-2:#f2f5f4; --sunk:#e2e8e6;
+  --ink:#0f1e25; --ink-2:#3d5058; --muted:#66787f; --faint:#8b9aa0;
+  --rule:#ccd6d4; --rule-2:#dde4e3;
+  --court:#1b6685;            /* hard court — the accent */
+  --court-soft:#d7e6ee;
+  --fault:#a54c31;            /* clay — topics that cost stars */
+  --want:#2b7899;             /* topics users ask for */
+  --good:#4a7845;             /* grass — praise */
+  --money:#8a6220;
+  --shadow:0 1px 2px rgba(15,30,37,.06),0 8px 24px -16px rgba(15,30,37,.28);
+  --mono:"Barlow",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0a161c; --panel:#0f2129; --panel-2:#132831; --sunk:#0b1a21;
+    --ink:#e4ecea; --ink-2:#b3c4c8; --muted:#85989e; --faint:#657a81;
+    --rule:#1e343e; --rule-2:#172b34;
+    --court:#57aad1; --court-soft:#14323f;
+    --fault:#d8805f; --want:#6cb7d9; --good:#82b177; --money:#c9a052;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -18px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0a161c; --panel:#0f2129; --panel-2:#132831; --sunk:#0b1a21;
+  --ink:#e4ecea; --ink-2:#b3c4c8; --muted:#85989e; --faint:#657a81;
+  --rule:#1e343e; --rule-2:#172b34;
+  --court:#57aad1; --court-soft:#14323f;
+  --fault:#d8805f; --want:#6cb7d9; --good:#82b177; --money:#c9a052;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px -18px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:var(--court)}
+h1,h2,h3{margin:0;font-family:"Barlow Condensed","Barlow Narrow",system-ui,sans-serif;
+  font-weight:700;letter-spacing:.005em;text-wrap:balance}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--court);outline-offset:2px;border-radius:3px}
+.wrap{max-width:1840px;margin:0 auto;padding:0 clamp(14px,2.2vw,34px)}
+.tnum{font-variant-numeric:tabular-nums}
+
+/* ── the point-sequence section marks (15 · 30 · 40 · game) ─────────────── */
+.mark{display:flex;align-items:baseline;gap:12px;margin:52px 0 16px;
+  border-bottom:1px solid var(--rule);padding-bottom:9px}
+.mark b{font-family:"Barlow Condensed",sans-serif;font-size:15px;font-weight:700;
+  letter-spacing:.16em;color:var(--court);min-width:44px}
+.mark h2{font-size:clamp(21px,2.1vw,29px);line-height:1.05;text-transform:uppercase;
+  letter-spacing:.02em}
+.mark p{margin:0 0 0 auto;max-width:56ch;font-size:13.5px;color:var(--muted);
+  text-align:right;line-height:1.45}
+
+/* ── masthead ──────────────────────────────────────────────────────────── */
+header.top{padding:26px 0 0}
+.brandrow{display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap}
+.eyebrow{font-family:"Barlow Condensed",sans-serif;font-size:13px;font-weight:600;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+h1.title{font-size:clamp(46px,7.4vw,104px);line-height:.86;letter-spacing:-.015em;
+  margin:14px 0 0;text-transform:uppercase}
+h1.title em{font-style:normal;color:var(--court)}
+.dek{margin:18px 0 0;max-width:64ch;font-family:"Newsreader",Georgia,serif;
+  font-size:clamp(16.5px,1.42vw,20px);line-height:1.5;color:var(--ink-2)}
+.themer{margin-left:auto;display:flex;gap:0;border:1px solid var(--rule);
+  border-radius:999px;overflow:hidden;background:var(--panel);flex:none}
+.themer button{background:none;border:0;padding:6px 13px;font-size:12px;
+  font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);
+  cursor:pointer}
+.themer button[aria-pressed="true"]{background:var(--court);color:#fff}
+
+/* ── the funnel ────────────────────────────────────────────────────────── */
+.funnel{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:1px;background:var(--rule-2);border:1px solid var(--rule);border-radius:4px;
+  overflow:hidden;margin-top:8px}
+.fstep{background:var(--panel);padding:15px 16px 16px;position:relative}
+.fstep .k{font-family:"Barlow Condensed",sans-serif;font-size:12.5px;font-weight:600;
+  letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
+.fstep .v{font-family:"Barlow Condensed",sans-serif;font-size:38px;font-weight:700;
+  line-height:1;margin:5px 0 6px}
+.fstep .d{font-size:12.5px;color:var(--muted);line-height:1.4}
+.fstep.drop .v{color:var(--fault)}
+.fstep.keep .v{color:var(--court)}
+.fstep ul{margin:7px 0 0;padding:0;list-style:none;font-size:12px;color:var(--muted)}
+.fstep li{display:flex;justify-content:space-between;gap:8px;padding:1.5px 0;
+  border-bottom:1px dotted var(--rule-2)}
+.fstep li b{font-weight:600;color:var(--ink-2)}
+
+/* ── thesis + chart ────────────────────────────────────────────────────── */
+.thesis{display:grid;grid-template-columns:minmax(300px,1fr) minmax(520px,2.05fr);
+  gap:clamp(18px,2.4vw,42px);align-items:start;margin-top:8px}
+.thesis .prose p{font-family:"Newsreader",Georgia,serif;font-size:17px;line-height:1.58;
+  color:var(--ink-2);margin:0 0 14px;max-width:60ch}
+.thesis .prose p.lede{font-size:20.5px;line-height:1.44;color:var(--ink)}
+.thesis .prose strong{color:var(--ink);font-weight:500}
+.howto{margin-top:16px;border-left:2px solid var(--court);padding:2px 0 2px 13px;
+  font-size:13px;color:var(--muted);line-height:1.5;max-width:52ch}
+.howto b{color:var(--ink-2);font-weight:600}
+.chartbox{background:var(--panel);border:1px solid var(--rule);border-radius:4px;
+  padding:16px 18px 10px;box-shadow:var(--shadow);overflow-x:auto}
+.chartbox svg{display:block;min-width:520px;width:100%}
+.chartlegend{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--muted);
+  padding:2px 0 10px}
+.chartlegend i{display:inline-block;width:9px;height:9px;border-radius:50%;
+  margin-right:5px;vertical-align:-1px}
+
+/* ── the bench ─────────────────────────────────────────────────────────── */
+.bench{display:grid;grid-template-columns:minmax(320px,1.05fr) minmax(420px,1.5fr);
+  gap:16px;align-items:start}
+@media(min-width:1240px){.bench{grid-template-columns:360px minmax(0,1fr) minmax(340px,.95fr)}}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:4px;
+  box-shadow:var(--shadow)}
+.card>h3{font-size:15px;letter-spacing:.13em;text-transform:uppercase;
+  padding:12px 15px;border-bottom:1px solid var(--rule);display:flex;
+  align-items:center;gap:9px}
+.card>h3 span{margin-left:auto;font-family:"Barlow",sans-serif;font-size:11.5px;
+  font-weight:500;letter-spacing:.04em;text-transform:none;color:var(--muted)}
+.cbody{padding:13px 15px}
+
+#codes{max-height:min(64vh,880px);overflow-y:auto}
+/* codebook rows */
+.code{border-bottom:1px solid var(--rule-2);padding:9px 15px}
+.code:last-child{border-bottom:0}
+.code.off{opacity:.42}
+.crow{display:flex;align-items:center;gap:9px}
+.crow .nm{font-weight:600;font-size:14px;flex:1;cursor:pointer;display:flex;
+  align-items:center;gap:7px}
+.dot{width:8px;height:8px;border-radius:50%;flex:none}
+.crow .cnt{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.crow .avg{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:16px;
+  min-width:38px;text-align:right;font-variant-numeric:tabular-nums}
+.cdef{font-size:12.5px;color:var(--muted);line-height:1.4;margin:3px 0 0}
+.pat{width:100%;margin-top:7px;background:var(--sunk);border:1px solid var(--rule-2);
+  border-radius:3px;padding:6px 8px;font-family:var(--mono);font-size:11.5px;
+  line-height:1.45;color:var(--ink-2);resize:vertical;min-height:34px;
+  white-space:pre-wrap;word-break:break-all}
+.pat.bad{border-color:var(--fault);color:var(--fault)}
+.cbtns{display:flex;gap:7px;padding:11px 15px;border-top:1px solid var(--rule);
+  flex-wrap:wrap}
+.btn{background:var(--panel-2);border:1px solid var(--rule);border-radius:3px;
+  padding:5px 11px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--ink-2)}
+.btn:hover{border-color:var(--court);color:var(--court)}
+.btn.on{background:var(--court);border-color:var(--court);color:#fff}
+
+/* filters */
+.filters{display:flex;flex-direction:column;gap:11px;padding:13px 15px}
+.frow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.flab{font-family:"Barlow Condensed",sans-serif;font-size:12px;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--faint);min-width:62px}
+.chip{background:none;border:1px solid var(--rule);border-radius:999px;
+  padding:3px 11px;font-size:12.5px;cursor:pointer;color:var(--ink-2);white-space:nowrap}
+.chip:hover{border-color:var(--court)}
+.chip[aria-pressed="true"]{background:var(--court);border-color:var(--court);color:#fff}
+.chip .n{opacity:.65;font-size:11px;margin-left:5px;font-variant-numeric:tabular-nums}
+.hist{padding:4px 15px 15px;border-top:1px solid var(--rule)}
+.hist .hrow{display:flex;align-items:center;gap:9px;padding:3px 0}
+.hist .hk{font-size:12px;color:var(--muted);min-width:22px;font-variant-numeric:tabular-nums}
+.hist .hb{height:13px;border-radius:2px;flex:none;min-width:2px}
+.hist .hn{font-size:12px;color:var(--faint);font-variant-numeric:tabular-nums}
+.hist h5{margin:12px 0 6px;font-family:"Barlow Condensed",sans-serif;font-size:12px;
+  font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--faint)}
+.search{flex:1;min-width:150px;background:var(--sunk);border:1px solid var(--rule);
+  border-radius:3px;padding:6px 10px;font-size:13.5px}
+
+/* review list */
+.rlist{max-height:min(74vh,1000px);overflow-y:auto;padding:0 3px 0 0}
+.rev{padding:12px 15px;border-bottom:1px solid var(--rule-2)}
+.rev:last-child{border-bottom:0}
+.rhead{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-bottom:5px}
+.stars{font-size:12.5px;letter-spacing:.06em;flex:none;font-variant-numeric:tabular-nums}
+.rapp{font-weight:600;font-size:13px;color:var(--ink);text-decoration:none;
+  border-bottom:1px solid var(--rule)}
+.rapp:hover{color:var(--court);border-color:var(--court)}
+.rmeta{font-size:11.5px;color:var(--faint);margin-left:auto;
+  font-variant-numeric:tabular-nums}
+.rtext{font-family:"Newsreader",Georgia,serif;font-size:14.8px;line-height:1.52;
+  color:var(--ink-2)}
+.rtext mark{background:var(--court-soft);color:var(--ink);padding:0 1px;border-radius:2px}
+.rtags{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.tag{font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;
+  padding:1.5px 6px;border-radius:2px;border:1px solid currentColor;opacity:.85}
+
+/* market map */
+.mapwrap{background:var(--panel);border:1px solid var(--rule);border-radius:4px;
+  box-shadow:var(--shadow);padding:14px 16px;overflow-x:auto}
+.mapwrap canvas{display:block;width:100%;height:auto;cursor:crosshair}
+.appcard{border-top:1px solid var(--rule);margin-top:11px;padding-top:11px;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:10px 16px;
+  min-height:74px}
+.appcard .f b{display:block;font-family:"Barlow Condensed",sans-serif;font-size:11.5px;
+  font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+.appcard .f span{font-size:14px;color:var(--ink)}
+.appcard .f.wide{grid-column:1/-1}
+
+/* table */
+.tablebox{background:var(--panel);border:1px solid var(--rule);border-radius:4px;
+  box-shadow:var(--shadow);overflow:auto;max-height:640px}
+table{border-collapse:collapse;width:100%;font-size:13.2px}
+th{position:sticky;top:0;background:var(--panel-2);text-align:left;padding:9px 11px;
+  font-family:"Barlow Condensed",sans-serif;font-size:12.5px;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--muted);cursor:pointer;
+  border-bottom:1px solid var(--rule);white-space:nowrap;z-index:2}
+th:hover{color:var(--court)}
+td{padding:7px 11px;border-bottom:1px solid var(--rule-2);vertical-align:top}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+tbody tr:hover{background:var(--panel-2)}
+
+/* methods */
+.blocks{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:14px;align-items:start}
+.block{background:var(--panel);border:1px solid var(--rule);border-radius:4px;
+  padding:15px 17px 17px;box-shadow:var(--shadow)}
+.block h4{margin:0 0 8px;font-family:"Barlow Condensed",sans-serif;font-size:16.5px;
+  font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.block p,.block li{font-size:13.6px;line-height:1.55;color:var(--ink-2);margin:0 0 9px}
+.block p:last-child,.block li:last-child{margin-bottom:0}
+.block ul{margin:0;padding-left:17px}
+.block code{font-family:var(--mono);font-size:12.2px;background:var(--sunk);
+  padding:1px 4px;border-radius:2px;word-break:break-word}
+.qlist{display:flex;flex-wrap:wrap;gap:4px}
+.qlist span{font-family:var(--mono);font-size:11.5px;background:var(--sunk);
+  border:1px solid var(--rule-2);border-radius:2px;padding:1.5px 6px;color:var(--muted)}
+footer{margin:60px 0 40px;padding-top:16px;border-top:1px solid var(--rule);
+  font-size:12.5px;color:var(--faint);display:flex;gap:16px;flex-wrap:wrap}
+.boot{padding:60px 0;font-family:"Barlow Condensed",sans-serif;font-size:20px;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){
+  .bar,.dotm{transition:all .35s cubic-bezier(.4,0,.2,1)}
+}
+@media(max-width:760px){
+  .mark p{margin-left:0;text-align:left;max-width:none}
+  .mark{flex-wrap:wrap}
+  .thesis{grid-template-columns:1fr}
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brandrow">
+      <div>
+        <div class="eyebrow">A systematic review of what racquet-sport apps get wrong</div>
+        <h1 class="title">Unforced<br><em>Error</em></h1>
+      </div>
+      <div class="themer" role="group" aria-label="Colour theme">
+        <button data-t="auto">Auto</button><button data-t="light">Light</button><button data-t="dark">Dark</button>
+      </div>
+    </div>
+    <p class="dek" id="dek">Reading the corpus…</p>
+  </header>
+
+  <div id="app"><div class="boot">Inflating the corpus…</div></div>
+</div>
+
+<script id="payload" type="application/gzip-base64">__PAYLOAD_B64__</script>
+<script>
+"use strict";
+/* ── theme ───────────────────────────────────────────────────────────────
+   Applied before the first paint from localStorage. The host may stamp no
+   data-theme at all, in which case the page would otherwise follow the OS
+   rather than the theme the reader is actually reading in.                */
+(function(){
+  var t="auto"; try{ t=localStorage.getItem("ue-theme")||"auto"; }catch(e){}
+  function apply(v){
+    if(v==="auto") document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.setAttribute("data-theme",v);
+    document.querySelectorAll(".themer button").forEach(function(b){
+      b.setAttribute("aria-pressed", String(b.dataset.t===v)); });
+  }
+  apply(t);
+  document.querySelectorAll(".themer button").forEach(function(b){
+    b.addEventListener("click",function(){
+      apply(b.dataset.t); try{ localStorage.setItem("ue-theme",b.dataset.t); }catch(e){}
+    });
+  });
+})();
+
+var D=null, R=null, MASK=null, RES=[], LOWER=null, ACTIVE=null;
+var ROLE_COLOR={fault:"var(--fault)",money:"var(--money)",want:"var(--want)",
+                craft:"var(--court)",surface:"var(--want)",good:"var(--good)"};
+var F={store:"all",sports:new Set(),types:new Set(),stars:new Set(),
+       q:"",code:null,aggr:false};
+
+function fmt(n){ return n==null?"—":n.toLocaleString("en-US"); }
+function esc(s){ return s.replace(/[&<>"]/g,function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+function stars(n){ return "★★★★★".slice(0,n)+"☆☆☆☆☆".slice(0,5-n); }
+
+/* ── boot ──────────────────────────────────────────────────────────────── */
+(async function(){
+  var b64=document.getElementById("payload").textContent.trim();
+  var host=document.getElementById("app");
+  if(typeof DecompressionStream!=="function"){
+    host.innerHTML='<div class="boot">This page ships its 19&nbsp;000-review corpus '+
+      'gzipped and needs <code>DecompressionStream</code>, which this browser does '+
+      'not have. Any current Chrome, Safari 16.4+ or Firefox 113+ will open it.</div>';
+    return;
+  }
+  var bin=atob(b64), bytes=new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+  var txt=await new Response(new Blob([bytes]).stream()
+            .pipeThrough(new DecompressionStream("gzip"))).text();
+  D=JSON.parse(txt);
+  R=D.reviews;                                     /* [appIdx, stars, year, text] */
+  LOWER=R.map(function(r){ return r[3].toLowerCase(); });
+  D.codes.forEach(function(c){ c.on=true; c.src=c.re; c.err=false; });
+  MASK=new Int32Array(R.length);
+  D.codes.forEach(function(c,i){ recode(i); });
+  build();
+})().catch(function(e){
+  document.getElementById("app").innerHTML=
+    '<div class="boot">Could not read the corpus: '+esc(String(e))+'</div>';
+});
+
+/* ── the coding engine ───────────────────────────────────────────────────
+   One bit per code, per review. Editing a pattern re-runs only that bit, so a
+   19k-review corpus recodes in well under a frame's budget instead of the
+   two seconds a full 18-pattern sweep would cost.                          */
+function recode(i){
+  var c=D.codes[i], bit=1<<i, re;
+  try{ re=new RegExp(c.src,"i"); c.err=false; }
+  catch(e){ c.err=true; for(var k=0;k<R.length;k++) MASK[k]&=~bit; return; }
+  for(var j=0;j<R.length;j++){
+    if(re.test(R[j][3])) MASK[j]|=bit; else MASK[j]&=~bit;
+  }
+}
+
+/* ── filtering ─────────────────────────────────────────────────────────── */
+function passes(j){
+  var r=R[j], a=D.apps[r[0]];
+  if(F.store!=="all" && a.store!==F.store) return false;
+  if(!F.aggr && a.sport==="multi-sport") return false;
+  if(F.sports.size && !F.sports.has(a.sport)) return false;
+  if(F.types.size && !F.types.has(a.type)) return false;
+  if(F.stars.size && !F.stars.has(r[1])) return false;
+  if(F.q && LOWER[j].indexOf(F.q)<0) return false;
+  return true;
+}
+function computeSet(){
+  RES=[]; for(var j=0;j<R.length;j++) if(passes(j)) RES.push(j);
+}
+function statsFor(bit){
+  var n=0,s=0;
+  for(var i=0;i<RES.length;i++){ var j=RES[i];
+    if(bit===null || (MASK[j]&bit)){ n++; s+=R[j][1]; } }
+  return {n:n, mean:n?s/n:null};
+}
+
+/* ── page assembly ─────────────────────────────────────────────────────── */
+function build(){
+  var scr=D.screen, ios=scr.ios, play=scr.play;
+  var totalIdent=ios.identified+play.identified;
+  var stores=[]; if(ios.reviews) stores.push("App Store"); if(play.reviews) stores.push("Google Play");
+
+  document.getElementById("dek").innerHTML=
+    "Every app in the racquet-sport corner of the App Store and Google Play was found by "+
+    "keyword and screened against a published rule — "+fmt(totalIdent)+" candidates down to "+
+    fmt(D.apps.length+(scr.unretrieved||0))+". Their reviews were then pulled and coded by a "+
+    "codebook you can edit on this page: <b>"+fmt(R.length)+" reviews</b> across <b>"+
+    fmt(D.apps.length)+" apps</b>"+
+    ((scr.unretrieved||0)?", after Apple stopped answering for the other "+
+      fmt(scr.unretrieved)+" — see below, because that is part of the method too":"")+
+    ". The question was what these apps get wrong. The answer was not the one I expected.";
+
+  var h=[];
+  h.push(section("15","The screen","A systematic review throws things out on the record. "+
+    "These are the counts and the reason for every exclusion."));
+  h.push('<div class="funnel">'+funnelHTML()+'</div>');
+
+  h.push(section("30","The split","Each topic below is a regular expression, not a judgement. "+
+    "What sorts them is the star rating of the reviews they catch."));
+  h.push('<div class="thesis"><div class="prose" id="thesis"></div>'+
+    '<div><div class="chartbox"><div class="chartlegend">'+
+    '<span><i style="background:var(--fault)"></i>costs stars</span>'+
+    '<span><i style="background:var(--want)"></i>earns them</span>'+
+    '<span><i style="background:var(--good)"></i>control code</span>'+
+    '<span style="margin-left:auto">dot size = share of the corpus</span></div>'+
+    '<svg id="chart" role="img" aria-label="Mean star rating by topic"></svg></div>'+
+    '<div class="howto"><b>How to read it.</b> The vertical line is the average rating of '+
+    'every review in the current selection. Each topic sits at its own average, and the bar '+
+    'is the distance between the two. Left of the line, a topic drags an app down; right of '+
+    'it, the topic shows up in reviews that are <em>happier</em> than average. Click a topic '+
+    'to read the reviews behind it.</div></div></div>');
+
+  h.push(section("40","The bench","Edit any pattern and the whole corpus recodes. "+
+    "Every review links out to the store listing it came from."));
+  h.push('<div class="bench">'+
+    '<div class="card"><h3>Codebook <span id="cbnote"></span></h3>'+
+      '<div id="codes"></div>'+
+      '<div class="cbtns">'+
+        '<button class="btn" id="addcode">+ New code</button>'+
+        '<button class="btn" id="allon">All on</button>'+
+        '<button class="btn" id="alloff">All off</button>'+
+        '<button class="btn" id="reset">Reset codebook</button>'+
+      '</div></div>'+
+    '<div class="card"><h3>Filters <span id="fnote"></span></h3>'+
+      '<div class="filters" id="filters"></div>'+
+      '<div id="chart2"></div></div>'+
+    '<div class="card"><h3>Reviews <span id="rnote"></span></h3>'+
+      '<div class="rlist" id="rlist"></div></div>'+
+    '</div>');
+
+  h.push(section("40","The market","Every app the search found, screened or not — "+
+    "because the tail is most of the store. Click a mark."));
+  h.push('<div class="mapwrap"><div class="frow" id="mapctl" style="margin-bottom:10px"></div>'+
+    '<canvas id="map" width="1600" height="620"></canvas>'+
+    '<div class="appcard" id="appcard"><div class="f wide" style="color:var(--muted);'+
+    'font-size:13.5px">Hover or click a mark to see the app behind it.</div></div></div>');
+
+  h.push(section("40","The shelf","The screened corpus, app by app. Sort any column."));
+  h.push('<div class="tablebox"><table id="tbl"><thead></thead><tbody></tbody></table></div>');
+
+  h.push(section("Game","Methods, and what this cannot tell you",""));
+  h.push('<div class="blocks">'+methodsHTML()+'</div>');
+  h.push('<footer><span>Built '+D.built+'. Harvested '+(D.harvested||"").slice(0,10)+'.</span>'+
+    '<span>Public store endpoints only; no account, no scraping behind a login.</span>'+
+    '<span>Review text belongs to its authors and is quoted for research.</span></footer>');
+
+  document.getElementById("app").innerHTML=h.join("");
+  renderCodes(); renderFilters(); refresh();
+  drawMap(); renderTable(); wireControls();
+}
+
+function section(mark,title,note){
+  return '<div class="mark"><b>'+mark+'</b><h2>'+title+'</h2>'+
+    (note?'<p>'+note+'</p>':'')+'</div>';
+}
+
+function funnelHTML(){
+  var s=D.screen, out=[];
+  function reasons(o){
+    var ks=Object.keys(o).sort(function(a,b){return o[b]-o[a];});
+    return '<ul>'+ks.map(function(k){
+      return '<li><span>'+esc(k)+'</span><b>'+fmt(o[k])+'</b></li>'; }).join("")+'</ul>';
+  }
+  var ident=s.ios.identified+s.play.identified;
+  var qn=(s.ios.queries||[]).length, qp=(s.play.queries||[]).length;
+  out.push('<div class="fstep"><div class="k">Identified</div><div class="v tnum">'+fmt(ident)+
+    '</div><div class="d">distinct apps returned by '+qn+' App&nbsp;Store and '+qp+
+    ' Google&nbsp;Play keyword searches, deduplicated.</div></div>');
+  var exI=s.ios.excluded||{}, exP=s.play.excluded||{}, all={};
+  Object.keys(exI).forEach(function(k){ all[k]=(all[k]||0)+exI[k]; });
+  Object.keys(exP).forEach(function(k){ all[k]=(all[k]||0)+exP[k]; });
+  var dropped=Object.keys(all).reduce(function(a,k){return a+all[k];},0);
+  out.push('<div class="fstep drop"><div class="k">Excluded</div><div class="v tnum">'+
+    fmt(dropped)+'</div><div class="d">each on one recorded criterion:</div>'+reasons(all)+'</div>');
+  out.push('<div class="fstep keep"><div class="k">Screened in</div><div class="v tnum">'+
+    fmt(D.apps.length)+'</div><div class="d">racquet-sport apps that are tools rather than '+
+    'games, are not betting products, and carry at least '+s.minRatings+' ratings — enough '+
+    'user feedback to say anything at all.</div></div>');
+  if(s.unretrieved){
+    out.push('<div class="fstep drop"><div class="k">Not retrieved</div><div class="v tnum">'+
+      fmt(s.unretrieved)+'</div><div class="d">screened in, but Apple’s review feed returned '+
+      '<code>403</code> for this machine for the whole of the build after an earlier harvest '+
+      'ran too fast. These apps stay in the market map below; none of their reviews are in '+
+      'the coded corpus, because none could be read.</div></div>');
+  }
+  out.push('<div class="fstep keep"><div class="k">Reviews retrieved</div><div class="v tnum">'+
+    fmt(R.length)+'</div><div class="d">across '+fmt(D.apps.length)+' apps — the most recent '+
+    'reviews the store will serve, capped at 500 per app on Apple and 597 on Play. '+
+    'Everything older exists and is unreachable.</div></div>');
+  var uncoded=0; for(var j=0;j<R.length;j++) if(!MASK[j]) uncoded++;
+  out.push('<div class="fstep"><div class="k">Coded</div><div class="v tnum">'+
+    fmt(R.length-uncoded)+'</div><div class="d">'+
+    Math.round(100*(R.length-uncoded)/R.length)+'% of the corpus matched at least one code. '+
+    'The rest is mostly “good app 👍”: the median review in this corpus is '+medianLen()+
+    ' characters long.</div></div>');
+  return out.join("");
+}
+function medianLen(){
+  var L=R.map(function(r){return r[3].length;}).sort(function(a,b){return a-b;});
+  return L[Math.floor(L.length/2)];
+}
+
+/* ── codebook UI ───────────────────────────────────────────────────────── */
+function renderCodes(){
+  var h=D.codes.map(function(c,i){
+    return '<div class="code'+(c.on?"":" off")+'" data-i="'+i+'">'+
+      '<div class="crow">'+
+        '<span class="nm" data-act="toggle"><i class="dot" style="background:'+
+          (ROLE_COLOR[c.role]||"var(--court)")+'"></i>'+esc(c.name)+'</span>'+
+        '<span class="cnt" id="cnt'+i+'"></span>'+
+        '<span class="avg" id="avg'+i+'"></span>'+
+      '</div>'+
+      '<p class="cdef">'+esc(c.def||"")+'</p>'+
+      '<textarea class="pat'+(c.err?" bad":"")+'" data-i="'+i+
+        '" spellcheck="false" rows="2">'+esc(c.src)+'</textarea>'+
+    '</div>';
+  }).join("");
+  document.getElementById("codes").innerHTML=h;
+  document.getElementById("codes").querySelectorAll(".nm").forEach(function(el){
+    el.addEventListener("click",function(){
+      var i=+el.closest(".code").dataset.i;
+      D.codes[i].on=!D.codes[i].on;
+      el.closest(".code").classList.toggle("off",!D.codes[i].on);
+      refresh();
+    });
+  });
+  document.getElementById("codes").querySelectorAll(".pat").forEach(function(t){
+    var timer=null;
+    t.addEventListener("input",function(){
+      clearTimeout(timer);
+      timer=setTimeout(function(){
+        var i=+t.dataset.i;
+        D.codes[i].src=t.value;
+        recode(i);
+        t.classList.toggle("bad",D.codes[i].err);
+        refresh();
+      },260);
+    });
+  });
+}
+
+/* ── filters UI ────────────────────────────────────────────────────────── */
+function renderFilters(){
+  var sports={}, types={};
+  D.apps.forEach(function(a){ sports[a.sport]=(sports[a.sport]||0)+1;
+                              types[a.type]=(types[a.type]||0)+1; });
+  function chips(obj,set,key){
+    return Object.keys(obj).sort(function(a,b){return obj[b]-obj[a];}).map(function(k){
+      return '<button class="chip" data-k="'+key+'" data-v="'+esc(k)+'" aria-pressed="'+
+        set.has(k)+'">'+esc(k)+'<span class="n">'+obj[k]+'</span></button>'; }).join("");
+  }
+  var oneStore=new Set(D.apps.map(function(a){return a.store;})).size<2;
+  var storeChips=["all","ios","play"].map(function(s){
+    var lab=s==="all"?"Both stores":(s==="ios"?"App Store":"Google Play");
+    var n=D.apps.filter(function(a){return s==="all"||a.store===s;}).length;
+    if(!n) return "";   /* a store with nothing retrieved gets no chip at all */
+    if(s==="all" && oneStore) return "";  /* …and then "both" is meaningless */
+    return '<button class="chip" data-k="store" data-v="'+s+'" aria-pressed="'+
+      (F.store===s)+'">'+lab+'<span class="n">'+n+'</span></button>'; }).join("");
+  document.getElementById("filters").innerHTML=
+    '<div class="frow"><span class="flab">Store</span>'+storeChips+
+      '<button class="chip" data-k="aggr" data-v="1" aria-pressed="'+F.aggr+
+      '" title="365Scores, ESPN, Sofascore and friends cover every sport; they matched '+
+      'because their listings mention tennis.">include multi-sport apps</button></div>'+
+    '<div class="frow"><span class="flab">Sport</span>'+chips(sports,F.sports,"sports")+'</div>'+
+    '<div class="frow"><span class="flab">Kind</span>'+chips(types,F.types,"types")+'</div>'+
+    '<div class="frow"><span class="flab">Stars</span>'+
+      [1,2,3,4,5].map(function(s){ return '<button class="chip" data-k="stars" data-v="'+s+
+        '" aria-pressed="'+F.stars.has(s)+'">'+s+'★</button>'; }).join("")+'</div>'+
+    '<div class="frow"><span class="flab">Text</span>'+
+      '<input class="search" id="q" placeholder="search the review text — try “wear os”, '+
+      '“doubles”, “csv”" value="'+esc(F.q)+'"></div>';
+
+  document.getElementById("filters").addEventListener("click",function(e){
+    var b=e.target.closest(".chip"); if(!b) return;
+    var k=b.dataset.k, v=b.dataset.v;
+    if(k==="store"){ F.store=v; }
+    else if(k==="aggr"){ F.aggr=!F.aggr; }
+    else { var set=F[k]; var val=(k==="stars")?+v:v;
+           if(set.has(val)) set.delete(val); else set.add(val); }
+    syncChips(); refresh();
+  });
+  var qi=document.getElementById("q"), t=null;
+  qi.addEventListener("input",function(){
+    clearTimeout(t); t=setTimeout(function(){ F.q=qi.value.trim().toLowerCase(); refresh(); },240);
+  });
+}
+function syncChips(){
+  document.querySelectorAll("#filters .chip").forEach(function(b){
+    var k=b.dataset.k,v=b.dataset.v,on=false;
+    if(k==="store") on=(F.store===v);
+    else if(k==="aggr") on=F.aggr;
+    else on=F[k].has(k==="stars"?+v:v);
+    b.setAttribute("aria-pressed",String(on));
+  });
+}
+
+/* ── the one number that matters, recomputed ───────────────────────────── */
+function refresh(){
+  computeSet();
+  var base=statsFor(null);
+  var rows=D.codes.map(function(c,i){
+    var st=statsFor(1<<i);
+    document.getElementById("cnt"+i).textContent=st.n?fmt(st.n):"—";
+    document.getElementById("avg"+i).textContent=st.mean?st.mean.toFixed(2):"—";
+    document.getElementById("avg"+i).style.color=st.mean==null?"var(--faint)":
+      (st.mean<base.mean?"var(--fault)":"var(--good)");
+    return {i:i,name:c.name,role:c.role,on:c.on,n:st.n,mean:st.mean};
+  }).filter(function(r){ return r.on && r.n>=8; });
+
+  document.getElementById("cbnote").textContent=
+    D.codes.filter(function(c){return c.on;}).length+" of "+D.codes.length+" on";
+  document.getElementById("fnote").textContent=fmt(RES.length)+" reviews selected";
+  drawChart(rows,base);
+  drawHist(base);
+  renderReviews(base);
+  writeThesis(rows,base);
+}
+
+function writeThesis(rows,base){
+  var el=document.getElementById("thesis"); if(!el) return;
+  var below=rows.filter(function(r){return r.mean<base.mean;})
+                .sort(function(a,b){return a.mean-b.mean;});
+  var above=rows.filter(function(r){return r.mean>base.mean && r.role!=="good";})
+                .sort(function(a,b){return b.mean-a.mean;});
+  if(!rows.length){ el.innerHTML='<p class="lede">No code is catching anything in this '+
+    'selection. Widen a filter, or check a pattern for a typo.</p>'; return; }
+  var w=below.slice(0,3).map(function(r){return "<strong>"+esc(r.name)+"</strong>";});
+  var g=above.slice(0,3).map(function(r){return "<strong>"+esc(r.name)+"</strong>";});
+  el.innerHTML=
+    '<p class="lede">The topics that cost an app stars are almost never features. '+
+    'They are '+(w.join(", ")||"—")+' — the plumbing.</p>'+
+    '<p>And the topics that show up in the <em>happiest</em> reviews are the ones a '+
+    'product manager would file as complaints: '+(g.join(", ")||"—")+'. '+
+    'Read a hundred of them and the pattern is plain — the people asking you for '+
+    'doubles support, a watch app, a CSV export are the people who already like the '+
+    'thing enough to want more of it. They are writing your roadmap at four and five '+
+    'stars. The one-star reviews are almost never about a missing feature. They are '+
+    'about a login that will not take, a subscription that charged twice, an app that '+
+    'closed itself in the middle of a match.</p>'+
+    '<p>Average rating across the '+fmt(RES.length)+' reviews currently selected: '+
+    '<strong>'+(base.mean?base.mean.toFixed(2):"—")+'★</strong>.</p>';
+}
+
+/* ── the chart ───────────────────────────────────────────────────────────
+   A lollipop per topic against a shared 1–5 star axis, with the selection's
+   own mean drawn as the reference line. Bar length is the distance between
+   the two, which is the only quantity on the page worth reading first.     */
+function drawChart(rows,base){
+  var svg=document.getElementById("chart"); if(!svg) return;
+  rows=rows.slice().sort(function(a,b){return a.mean-b.mean;});
+  var padL=168, padR=64, padT=26, padB=30, rowH=23;
+  var W=980, H=padT+padB+rows.length*rowH;
+  var x0=1, x1=5;
+  var maxN=Math.max.apply(null,rows.map(function(r){return r.n;}).concat([1]));
+  function X(v){ return padL+(v-x0)/(x1-x0)*(W-padL-padR); }
+  var o=[];
+  o.push('<g font-family="Barlow, sans-serif" font-size="11" fill="var(--faint)">');
+  for(var t=1;t<=5;t++){
+    o.push('<line x1="'+X(t)+'" y1="'+(padT-8)+'" x2="'+X(t)+'" y2="'+(H-padB+4)+
+      '" stroke="var(--rule-2)" stroke-width="1"/>');
+    o.push('<text x="'+X(t)+'" y="'+(H-padB+18)+'" text-anchor="middle">'+t+'★</text>');
+  }
+  o.push('</g>');
+  if(base.mean){
+    o.push('<line x1="'+X(base.mean)+'" y1="'+(padT-14)+'" x2="'+X(base.mean)+'" y2="'+
+      (H-padB+4)+'" stroke="var(--ink-2)" stroke-width="1.5" stroke-dasharray="4 3"/>');
+    o.push('<text x="'+X(base.mean)+'" y="'+(padT-20)+'" text-anchor="middle" '+
+      'font-family="Barlow Condensed, sans-serif" font-size="11.5" font-weight="600" '+
+      'letter-spacing=".08em" fill="var(--ink-2)">SELECTION MEAN '+base.mean.toFixed(2)+
+      '</text>');
+  }
+  rows.forEach(function(r,k){
+    var y=padT+k*rowH+rowH/2;
+    var col=r.role==="good"?"var(--good)":(r.mean<base.mean?"var(--fault)":"var(--want)");
+    var rad=4+7*Math.sqrt(r.n/maxN);
+    o.push('<text x="'+(padL-13)+'" y="'+(y+4)+'" text-anchor="end" '+
+      'font-family="Barlow, sans-serif" font-size="12.5" fill="var(--ink-2)" '+
+      'style="cursor:pointer" data-code="'+r.i+'">'+esc(r.name)+'</text>');
+    o.push('<line class="bar" x1="'+X(base.mean)+'" y1="'+y+'" x2="'+X(r.mean)+'" y2="'+y+
+      '" stroke="'+col+'" stroke-width="2.5" opacity=".5"/>');
+    o.push('<circle class="dotm" cx="'+X(r.mean)+'" cy="'+y+'" r="'+rad.toFixed(1)+
+      '" fill="'+col+'" opacity=".9" style="cursor:pointer" data-code="'+r.i+'">'+
+      '<title>'+esc(r.name)+' — '+fmt(r.n)+' reviews, mean '+r.mean.toFixed(2)+'★</title></circle>');
+    o.push('<text x="'+(W-padR+9)+'" y="'+(y+4)+'" font-family="Barlow, sans-serif" '+
+      'font-size="11.5" fill="var(--faint)" style="font-variant-numeric:tabular-nums">'+
+      fmt(r.n)+'</text>');
+  });
+  svg.setAttribute("viewBox","0 0 "+W+" "+H);
+  svg.setAttribute("height",H);
+  svg.innerHTML=o.join("");
+  svg.querySelectorAll("[data-code]").forEach(function(el){
+    el.addEventListener("click",function(){
+      var i=+el.dataset.code;
+      F.code=(F.code===i)?null:i;
+      renderReviews(statsFor(null));
+      document.getElementById("rlist").scrollTop=0;
+    });
+  });
+}
+
+/* ── the shape of the selection ────────────────────────────────────────
+   A mean of 3.5 can be a wall of threes or a corpus split between one and
+   five. In app stores it is always the second, and the histogram says so.  */
+function drawHist(base){
+  var el=document.getElementById("chart2"); if(!el) return;
+  var c=[0,0,0,0,0,0];
+  for(var i=0;i<RES.length;i++) c[R[RES[i]][1]]++;
+  var max=Math.max.apply(null,c.slice(1))||1;
+  var col=["","var(--fault)","var(--fault)","var(--muted)","var(--good)","var(--good)"];
+  var rows="";
+  for(var s2=5;s2>=1;s2--){
+    rows+='<div class="hrow"><span class="hk">'+s2+'★</span>'+
+      '<span class="hb" style="width:'+(6+92*c[s2]/max).toFixed(1)+'%;background:'+col[s2]+
+      ';opacity:.78"></span><span class="hn">'+fmt(c[s2])+' · '+
+      (RES.length?Math.round(100*c[s2]/RES.length):0)+'%</span></div>';
+  }
+  el.innerHTML='<div class="hist"><h5>Shape of the selection · mean '+
+    (base.mean?base.mean.toFixed(2):"—")+'★</h5>'+rows+
+    '<p style="margin:9px 0 0;font-size:12.5px;color:var(--muted);line-height:1.45">'+
+    'App-store ratings are U-shaped, not bell-shaped. People write when they are '+
+    'delighted or furious, which is why a mean is a poor summary of one and the topic '+
+    'chart above is a better one.</p></div>';
+}
+
+/* ── review reader ─────────────────────────────────────────────────────── */
+function renderReviews(base){
+  var list=document.getElementById("rlist"); if(!list) return;
+  var bit=F.code==null?null:(1<<F.code);
+  /* Reviews arrive grouped by app, so the first 400 of anything are the first
+     app's. Round-robin across apps instead: the reader gets a cross-section of
+     the selection rather than one developer's morning. */
+  var byApp={}, order=[];
+  for(var i=0;i<RES.length;i++){
+    var j=RES[i];
+    if(bit!==null && !(MASK[j]&bit)) continue;
+    var a=R[j][0];
+    if(!byApp[a]){ byApp[a]=[]; order.push(a); }
+    byApp[a].push(j);
+  }
+  var total=0; order.forEach(function(a){ total+=byApp[a].length; });
+  var sel=[], round=0;
+  while(sel.length<400){
+    var added=false;
+    for(var k=0;k<order.length && sel.length<400;k++){
+      var q=byApp[order[k]];
+      if(round<q.length){ sel.push(q[round]); added=true; }
+    }
+    if(!added) break;
+    round++;
+  }
+  document.getElementById("rnote").innerHTML=
+    (F.code==null?"":'<b style="color:var(--court)">'+esc(D.codes[F.code].name)+'</b> · ')+
+    fmt(total)+" match"+(total===1?"":"es")+
+    (total>sel.length?" · showing "+sel.length+", spread across "+order.length+" apps":"");
+  var hl=null;
+  if(F.code!=null && !D.codes[F.code].err){
+    try{ hl=new RegExp("("+D.codes[F.code].src+")","ig"); }catch(e){ hl=null; }
+  } else if(F.q){ hl=new RegExp("("+F.q.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")","ig"); }
+  list.innerHTML=sel.map(function(j){
+    var r=R[j], a=D.apps[r[0]];
+    var body=esc(r[3]);
+    if(hl) body=body.replace(hl,"<mark>$1</mark>");
+    var tags=[];
+    D.codes.forEach(function(c,ci){ if(c.on && (MASK[j]&(1<<ci)))
+      tags.push('<span class="tag" style="color:'+(ROLE_COLOR[c.role]||"var(--court)")+'">'+
+        esc(c.name)+'</span>'); });
+    return '<div class="rev"><div class="rhead">'+
+      '<span class="stars" style="color:'+(r[1]<=2?"var(--fault)":r[1]>=4?"var(--good)":"var(--muted)")+
+        '">'+stars(r[1])+'</span>'+
+      '<a class="rapp" href="'+esc(a.url||"#")+'" target="_blank" rel="noopener">'+
+        esc(a.name)+'</a>'+
+      '<span class="rmeta">'+(a.store==="ios"?"App Store":"Google Play")+
+        (r[2]?" · "+r[2]:"")+'</span></div>'+
+      '<div class="rtext">'+body+'</div>'+
+      (tags.length?'<div class="rtags">'+tags.join("")+'</div>':'')+'</div>';
+  }).join("") || '<div class="rev" style="color:var(--muted)">Nothing matches. '+
+    'Loosen a filter or a pattern.</div>';
+}
+
+/* ── the market map ────────────────────────────────────────────────────── */
+var MAPSTATE={store:"all",hit:null};
+function drawMap(){
+  var cv=document.getElementById("map"); if(!cv) return;
+  var ctl=document.getElementById("mapctl");
+  ctl.innerHTML='<span class="flab">Show</span>'+
+    ["all","ios","play"].map(function(s){
+      var lab=s==="all"?"Both stores":(s==="ios"?"App Store":"Google Play");
+      return '<button class="chip" data-m="'+s+'" aria-pressed="'+(MAPSTATE.store===s)+
+        '">'+lab+'</button>'; }).join("")+
+    '<span style="margin-left:auto;font-size:12.5px;color:var(--muted)">'+
+    'x: ratings (log) · y: average rating · filled = screened into the corpus</span>';
+  ctl.onclick=function(e){ var b=e.target.closest("[data-m]"); if(!b) return;
+    MAPSTATE.store=b.dataset.m; drawMap(); };
+  var pts=D.census.filter(function(a){
+    return a.score && a.n>=1 && (MAPSTATE.store==="all"||a.store===MAPSTATE.store); });
+  var dpr=Math.min(2,window.devicePixelRatio||1);
+  var W=1600,H=620; cv.width=W*dpr; cv.height=H*dpr; cv.style.aspectRatio=W+"/"+H;
+  var g=cv.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,W,H);
+  var cs=getComputedStyle(document.documentElement);
+  var C=function(v){ return cs.getPropertyValue(v).trim()||"#888"; };
+  var padL=64,padR=22,padT=20,padB=44;
+  var maxN=Math.max.apply(null,pts.map(function(p){return p.n;}));
+  function X(n){ return padL+(Math.log10(n)/Math.log10(maxN))*(W-padL-padR); }
+  function Y(s){ return padT+(5-s)/4*(H-padT-padB); }
+  g.strokeStyle=C("--rule-2"); g.fillStyle=C("--faint");
+  g.font='12px Barlow, sans-serif'; g.lineWidth=1;
+  for(var s=1;s<=5;s++){ g.beginPath(); g.moveTo(padL,Y(s)); g.lineTo(W-padR,Y(s));
+    g.stroke(); g.textAlign="right"; g.fillText(s+"★",padL-9,Y(s)+4); }
+  [1,10,100,1000,10000,100000,1000000].forEach(function(v){
+    if(v>maxN) return; g.beginPath(); g.moveTo(X(v),padT); g.lineTo(X(v),H-padB);
+    g.stroke(); g.textAlign="center";
+    g.fillText(v>=1000?(v/1000)+"k":String(v),X(v),H-padB+18); });
+  g.textAlign="center"; g.fillStyle=C("--muted");
+  g.fillText("ratings on the store (log scale)",(padL+W-padR)/2,H-8);
+  var SPORTC={tennis:"--court",pickleball:"--fault",padel:"--want",badminton:"--good",
+              "table tennis":"--money","multi-sport":"--faint"};
+  MAPSTATE.pts=pts.map(function(p){
+    var x=X(p.n), y=Y(p.score), col=C(SPORTC[p.sport]||"--faint");
+    g.beginPath(); g.arc(x,y,p.included?4.6:2.6,0,6.2832);
+    if(p.included){ g.fillStyle=col; g.globalAlpha=.82; g.fill(); }
+    else { g.strokeStyle=col; g.globalAlpha=.5; g.lineWidth=1.2; g.stroke(); }
+    g.globalAlpha=1;
+    return {x:x,y:y,a:p};
+  });
+  var lg=Object.keys(SPORTC).filter(function(k){
+    return pts.some(function(p){return p.sport===k;}); });
+  g.textAlign="left"; g.font='12px Barlow, sans-serif';
+  var lx=padL+8;
+  lg.forEach(function(k){
+    g.fillStyle=C(SPORTC[k]); g.beginPath(); g.arc(lx+4,padT+10,4.4,0,6.2832); g.fill();
+    g.fillStyle=C("--muted"); g.fillText(k,lx+13,padT+14);
+    lx+=g.measureText(k).width+34;
+  });
+  cv.onmousemove=function(e){
+    var r=cv.getBoundingClientRect(), sx=W/r.width;
+    var mx=(e.clientX-r.left)*sx, my=(e.clientY-r.top)*sx, best=null,bd=1e9;
+    MAPSTATE.pts.forEach(function(p){
+      var d=(p.x-mx)*(p.x-mx)+(p.y-my)*(p.y-my); if(d<bd){bd=d;best=p;} });
+    if(best && bd<400) showApp(best.a);
+  };
+}
+function showApp(a){
+  var el=document.getElementById("appcard"); if(!el) return;
+  function f(k,v,wide){ return '<div class="f'+(wide?" wide":"")+'"><b>'+k+'</b><span>'+
+    v+'</span></div>'; }
+  var mine=D.apps.findIndex(function(x){return x.id===a.id&&x.store===a.store;});
+  var nrev=mine<0?0:R.reduce(function(n,r){return n+(r[0]===mine?1:0);},0);
+  el.innerHTML=
+    f("App",'<a href="'+esc(a.url||"#")+'" target="_blank" rel="noopener">'+esc(a.name)+'</a>',true)+
+    f("Developer",esc(a.dev||"—"))+
+    f("Store",a.store==="ios"?"App Store":"Google Play")+
+    f("Sport",esc(a.sport))+ f("Kind",esc(a.type))+
+    f("Rating",(a.score?a.score.toFixed(2)+"★":"—")+' <span style="color:var(--muted)">of '+
+      fmt(a.n)+" ratings</span>")+
+    f("Updated",esc(a.updated||"—"))+
+    f("In the corpus",a.included?fmt(nrev)+" reviews read":"screened out");
+}
+
+/* ── the shelf ─────────────────────────────────────────────────────────── */
+var SORT={k:"n",dir:-1};
+function renderTable(){
+  var counts={}, sums={}, tops={};
+  for(var j=0;j<R.length;j++){
+    var i=R[j][0]; counts[i]=(counts[i]||0)+1; sums[i]=(sums[i]||0)+R[j][1];
+    if(MASK[j]){ tops[i]=tops[i]||{};
+      D.codes.forEach(function(c,ci){ if(MASK[j]&(1<<ci)&&c.role!=="good")
+        tops[i][c.name]=(tops[i][c.name]||0)+1; }); }
+  }
+  var rows=D.apps.map(function(a,i){
+    var t=tops[i]||{}, best=Object.keys(t).sort(function(x,y){return t[y]-t[x];})[0];
+    return {name:a.name,store:a.store==="ios"?"App Store":"Google Play",sport:a.sport,
+      type:a.type,n:a.n,score:a.score,rev:counts[i]||0,
+      mean:counts[i]?sums[i]/counts[i]:null,top:best||"—",url:a.url};
+  });
+  var cols=[["name","App",0],["store","Store",0],["sport","Sport",0],["type","Kind",0],
+            ["n","Ratings",1],["score","Store ★",1],["rev","Read",1],["mean","Mean ★",1],
+            ["top","Most-coded topic",0]];
+  var tb=document.getElementById("tbl");
+  tb.querySelector("thead").innerHTML='<tr>'+cols.map(function(c){
+    return '<th data-k="'+c[0]+'"'+(c[2]?' class="num"':'')+'>'+c[1]+
+      (SORT.k===c[0]?(SORT.dir<0?" ▾":" ▴"):"")+'</th>'; }).join("")+'</tr>';
+  rows.sort(function(a,b){
+    var x=a[SORT.k], y=b[SORT.k];
+    if(x==null) return 1; if(y==null) return -1;
+    return (typeof x==="string"? x.localeCompare(y) : x-y)*SORT.dir; });
+  tb.querySelector("tbody").innerHTML=rows.map(function(r){
+    return '<tr><td><a href="'+esc(r.url||"#")+'" target="_blank" rel="noopener">'+
+      esc(r.name)+'</a></td><td>'+r.store+'</td><td>'+esc(r.sport)+'</td><td>'+
+      esc(r.type)+'</td><td class="num">'+fmt(r.n)+'</td><td class="num">'+
+      (r.score?r.score.toFixed(2):"—")+'</td><td class="num">'+fmt(r.rev)+
+      '</td><td class="num">'+(r.mean?r.mean.toFixed(2):"—")+'</td><td>'+
+      esc(r.top)+'</td></tr>'; }).join("");
+  tb.querySelector("thead").onclick=function(e){
+    var th=e.target.closest("th"); if(!th) return;
+    if(SORT.k===th.dataset.k) SORT.dir*=-1; else { SORT.k=th.dataset.k; SORT.dir=-1; }
+    renderTable();
+  };
+}
+
+function wireControls(){
+  document.getElementById("addcode").onclick=function(){
+    if(D.codes.length>=31){ return; }
+    D.codes.push({name:"new code "+(D.codes.length+1),role:"want",
+      src:"\\b(your term here)\\b",def:"Yours. Type a pattern and the corpus recodes.",
+      on:true,err:false});
+    MASK=MASK; recode(D.codes.length-1); renderCodes(); refresh();
+    var last=document.querySelector("#codes .code:last-child .pat");
+    if(last){ last.focus(); last.select(); }
+  };
+  document.getElementById("allon").onclick=function(){
+    D.codes.forEach(function(c){c.on=true;}); renderCodes(); refresh(); };
+  document.getElementById("alloff").onclick=function(){
+    D.codes.forEach(function(c){c.on=false;}); renderCodes(); refresh(); };
+  document.getElementById("reset").onclick=function(){
+    D.codes=D.codes.filter(function(c){ return c.re; });
+    D.codes.forEach(function(c,i){ c.src=c.re; c.on=true; recode(i); });
+    F.code=null; renderCodes(); refresh(); };
+}
+
+/* ── methods ───────────────────────────────────────────────────────────── */
+function methodsHTML(){
+  var s=D.screen;
+  function qs(a){ return '<div class="qlist">'+(a||[]).map(function(q){
+    return "<span>"+esc(q)+"</span>"; }).join("")+'</div>'; }
+  var b=[];
+  b.push('<div class="block"><h4>Where the data came from</h4>'+
+    '<p>Two public endpoints, no key and no account on either.</p>'+
+    '<p><b>Apple.</b> <code>itunes.apple.com/search</code> for the census — it returns full '+
+    'metadata for up to 200 apps per query. Review text comes from the customer-reviews RSS '+
+    'feed, 50 per page, ten pages, so <b>500 reviews per app is the ceiling</b> and older '+
+    'reviews are simply unreachable.</p>'+
+    '<p><b>Google.</b> Play has no such feed. The census is scraped from the rendered search '+
+    'pages, which still carry every result’s package name in an <code>href</code>; app '+
+    'metadata is read out of the positional <code>ds:5</code> array embedded in the listing; '+
+    'reviews come from Play’s internal <code>batchexecute</code> RPC, 199 per call, '+
+    'three calls, so <b>597 per app</b>. None of that is documented and all of it can '+
+    'break without notice.</p></div>');
+  b.push('<div class="block"><h4>The search strategy</h4>'+
+    '<p>Deliberately over-broad, the way a systematic search should be: recall first, then '+
+    'throw things out on the record. '+(s.ios.queries||[]).length+' terms on the App Store, '+
+    (s.play.queries||[]).length+' on Play.</p>'+
+    '<p><b>The two are not equally deep, and it matters.</b> Apple serves 200 results a '+
+    'query; Play serves about 30. The Play list was extended to '+(s.play.queries||[]).length+
+    ' terms to compensate and still finds a shallower census. Compare the two stores’ '+
+    '<em>rates</em>, never their totals.</p>'+qs(s.play.queries)+'</div>');
+  b.push('<div class="block"><h4>Who got thrown out</h4>'+
+    '<p>Four criteria, applied to the app name plus the first '+s.descChars+
+    ' characters of its description.</p>'+
+    '<ul><li><b>Names a racquet sport</b> — <code>'+esc(s.sportRe)+'</code></li>'+
+    '<li><b>Is not a video game.</b> On Apple that is the genre. On Play the displayed genre '+
+    'is useless — Play files <em>Tennis Clash</em> under “Sports”, exactly like a real '+
+    'scorekeeper. The machine-readable <code>genreId</code> is the honest flag: every game '+
+    'carries <code>GAME_*</code>. Missing this the first time put twenty video games in the '+
+    'top thirty-five of the corpus.</li>'+
+    '<li><b>Is not a betting product</b> — <code>'+esc(s.betRe)+'</code></li>'+
+    '<li><b>Has at least '+s.minRatings+' ratings</b>, or there is nothing to read.</li></ul></div>');
+  b.push('<div class="block"><h4>The codebook, and what calibration cost it</h4>'+
+    '<p>Every code is a regular expression, printed on this page and editable in it. No '+
+    'language model reads a single review: a model would code more subtly, but you could not '+
+    'publish it, re-run it, or argue with it — and a codebook you cannot argue with is not '+
+    'a method.</p>'+
+    '<p>A random sample of twenty reviews per code was read by hand. Six tokens were cut:</p>'+
+    '<ul><li><code>unusable</code> — “unusable due to the number of ads” is not a crash</li>'+
+    '<li><code>new phone</code> — “on a new phone, the app doesn’t launch” is not data loss</li>'+
+    '<li><code>not correct</code> — fired on a signup form, not on a score</li>'+
+    '<li><code>please fix</code> — a bug report, not a feature request</li>'+
+    '<li><code>user friendly</code> — fired on <em>praise</em> nine times in twenty</li>'+
+    '<li>bare <code>offline</code> — the Indian court-booking apps in this corpus discuss '+
+    '“offline bookings”, made by telephone, constantly</li></ul>'+
+    '<p>The last one is the lesson. A word can be unambiguous in the domain you imagined and '+
+    'mean something else entirely in the corpus you actually have.</p></div>');
+  b.push('<div class="block"><h4>Codes are topics, not verdicts</h4>'+
+    '<p>A code fires on any review that mentions its subject, at any star rating. Nothing '+
+    'here filters on sentiment, because sentiment is the thing being measured: a topic’s '+
+    'mean rating is a <em>result</em>, not an input.</p>'+
+    '<p>That is why <b>praise</b> is in the codebook at all. It is a control. If a topic’s '+
+    'wording is loose enough to fire alongside “love this app”, its mean rating drifts toward '+
+    'the corpus mean and the code is wrong. That is exactly how <code>user friendly</code> '+
+    'was caught.</p></div>');
+  b.push('<div class="block"><h4>What this cannot tell you</h4>'+
+    '<ul>'+(s.unretrieved?'<li><b>Anything about iOS users.</b> The coded corpus is Google '+
+    'Play only. Android and iOS user bases differ in country mix, in what they pay for and '+
+    'in what they tolerate, and none of the rates on this page should be carried across '+
+    'without checking.</li>':'')+
+    '<li><b>Reviewers are not users.</b> People write reviews when they are delighted or '+
+    'furious. The silent middle of every app’s user base is absent from this corpus by '+
+    'construction, and no weighting fixes that.</li>'+
+    '<li><b>Only the recent tail is reachable.</b> 500 and 597 reviews per app are the '+
+    'ceilings. For the largest apps here that is a few months; for a small one it is its '+
+    'whole life. The corpus is therefore biased toward whatever the big apps did lately.</li>'+
+    '<li><b>The two stores count differently.</b> Apple’s rating count is US-only; '+
+    'Play’s is worldwide. The star scales are nominally the same and the populations '+
+    'are not.</li>'+
+    '<li><b>Multi-sport apps drag the average.</b> ESPN, Sofascore, 365Scores and friends '+
+    'matched because their listings mention tennis; most of their reviews are about football. '+
+    'They are excluded by default and can be switched back on.</li>'+
+    '<li><b>English only.</b> Both harvests used the US storefront. Reviews in other '+
+    'languages are in the corpus and no code will ever fire on them.</li></ul></div>');
+  if(s.unretrieved){
+    b.push('<div class="block" style="border-color:var(--fault)">'+
+      '<h4 style="color:var(--fault)">The half of this that failed</h4>'+
+      '<p>This was built to compare two stores. It compares one, and the reason is worth '+
+      'more than the comparison would have been.</p>'+
+      '<p>Apple’s review feed answers about five requests a second. The first harvest ran six '+
+      'threads a tenth of a second apart — call it fifty a second — and within a minute the '+
+      'endpoint returned <code>403</code> to this machine for everything, and kept doing so '+
+      'for the rest of the build. The 403 body is HTML, so with no status check it surfaces '+
+      'as a JSON parse error and reads like a bug in your own code.</p>'+
+      '<p>Four other routes to the same text were tried and all four are closed:</p>'+
+      '<ul><li>the same feed under its older path — same block, it is the endpoint and not '+
+      'the URL</li>'+
+      '<li><code>amp-api.apps.apple.com</code>, which is what the web App Store itself calls: '+
+      '<code>401</code>. It wants a bearer token that the front end reads from '+
+      '<code>process.env.MEDIA_API_TOKEN</code>, and that value is in neither the page nor '+
+      'either script bundle</li>'+
+      '<li>the product page’s own server-rendered data, which does carry reviews — but '+
+      '<b>eight of them</b>, chosen by Apple for being helpful. Eight featured reviews per '+
+      'app is not a sample, it is a highlight reel, and mixing it with 597 unfiltered Play '+
+      'reviews would have produced a store comparison that was pure artefact</li>'+
+      '<li><code>?see-all=reviews</code>, which renders its list on the client and ships '+
+      'none of it in the HTML</li></ul>'+
+      '<p>So the App Store is present here as a <b>census</b> — '+fmt(s.ios.identified)+
+      ' apps with full metadata, all of them on the market map — and absent as a '+
+      '<b>corpus</b>. Both retrieval stages write one file per app and skip what is already '+
+      'on disk, so the moment Apple relents the run resumes where it stopped and this page '+
+      'can be rebuilt with both arms. Google, for its part, never complained once.</p></div>');
+  } else {
+    b.push('<div class="block"><h4>Rate limits, which are part of the method</h4>'+
+      '<p>Apple’s review feed answers about five requests a second and then stops answering '+
+      'at all. The first harvest ran fifty a second, earned a flat <code>403</code> on the '+
+      'whole endpoint, and had to sit it out. The 403 body is HTML, so without a status check '+
+      'it surfaces as a JSON parse error and looks like a bug in your own code.</p>'+
+      '<p>Both retrieval stages write one file per app and skip what is already on disk, so a '+
+      'run that dies halfway resumes instead of restarting. Play tolerated the same load '+
+      'without complaint.</p></div>');
+  }
+  return b.join("");
+}
+</script>

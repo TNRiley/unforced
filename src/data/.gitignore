@@ -1,0 +1,5 @@
+# The raw harvest: ~34 MB of store JSON plus one file per app from each store's
+# review retrieval. All of it is refetched by the scripts in ../ and none of it
+# belongs in a repo. This file is the only thing here that is tracked.
+*
+!.gitignore
